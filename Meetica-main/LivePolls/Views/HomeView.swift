@@ -14,18 +14,31 @@ struct SignupView : View {
     @State var email : String = ""
     @State var password : String = ""
     @State var repeatPassword : String = ""
+   
+    
+    
     @State var isOk = false
     var body : some View {
         NavigationStack {
             ZStack{
                 Spacer(minLength: 20)
-                VStack {
-                    
-                    Text("Meetica").font(.title)
-                    TextField("İsminizi giriniz", text: $firstname).padding(10)
-                    TextField("mailinizi giriniz", text: $email).padding(10)
-                    TextField("şifreiniz giriniz", text: $password).padding(10)
-                    TextField("şirenizi tekrar giriniz", text: $repeatPassword).padding(10).background(Color.blue).clipShape(.capsule)
+                VStack(spacing: 15) {
+                    Spacer()
+                    Text("MEETICA").font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        ).shadow(color: .cyan, radius: 5, x: 0, y: 5)
+                        .padding()
+                    Spacer()
+                    TextField("İsminizi giriniz", text: $firstname).padding(10).background((Color(UIColor.systemGray6))).clipShape(.capsule)
+                    TextField("Mailinizi giriniz", text: $email).padding(10).background(Color(UIColor.systemGray6)).clipShape(.capsule)
+                    TextField("Şifreiniz giriniz", text: $password).padding(10).background(Color(UIColor.systemGray6)).clipShape(.capsule)
+                    TextField("Şifrenizi tekrar giriniz", text: $repeatPassword).padding(10).background(Color(UIColor.systemGray6)).clipShape(.capsule)
                 
                     
                     Button {
@@ -37,7 +50,7 @@ struct SignupView : View {
                     } label: {
                         
                            
-                            Text("Signup").padding()
+                        Text("Kayıt ol").padding().background(Color(UIColor.systemGray4)).clipShape(.capsule)
                         
                     }.navigationDestination(isPresented: $isOk) {
                         HomeView()
@@ -51,7 +64,7 @@ struct SignupView : View {
                         LoginView()
                     } label: {
                        
-                            Text("Already have an account").padding()
+                        Text("Zaten bir hesabınız var mı? Oturum aç").padding()
                         
                        
                     }
@@ -62,7 +75,7 @@ struct SignupView : View {
                     
                 }.padding(20)
                 Spacer()
-            }.background(Color.gray)
+            }.background(Color.white)
         }
         
         
@@ -79,13 +92,21 @@ struct LoginView : View {
     var body : some View {
         NavigationStack {
             ZStack{
-                Spacer(minLength: 20)
-                VStack {
+                VStack(spacing: 15) {
+                    Spacer()
+                    Text("MEETICA").font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        ).shadow(color: .cyan, radius: 5, x: 0, y: 5)
+                        .padding()
                     
-                    Text("Meetica").font(.title)
-                
-                    TextField("mailinizi giriniz", text: $email).padding(10)
-                    TextField("şifreiniz giriniz", text: $password).padding(10)
+                    TextField("Mailinizi giriniz", text: $email).padding(10).background(Color(UIColor.systemGray6)).clipShape(.capsule)
+                    TextField("Şifreiniz giriniz", text: $password).padding(10).background(Color(UIColor.systemGray6)).clipShape(.capsule)
                     
                 
                         
@@ -98,7 +119,7 @@ struct LoginView : View {
                     } label: {
                         
                            
-                            Text("Login").padding()
+                            Text("Oturum aç").padding().background(Color(UIColor.systemGray4)).clipShape(.capsule)
                         
                     }.navigationDestination(isPresented: $isOk) {
                         HomeView()
@@ -106,21 +127,22 @@ struct LoginView : View {
                     NavigationLink {
                         SignupView()
                     } label: {
-                       
-                            Text("New here? Create an account").padding()
+            
+                            Text("Hesabınız yok mu? Kaydol").padding()
                         
                        
                     }
+                    Spacer()
                              }
                    
                         
 
                     
-                    Spacer()
+                    
                     
                 }.padding(20)
                 Spacer()
-            }.background(Color.gray)
+        }.background(Color.white)
         }
         
 
@@ -132,6 +154,9 @@ struct HomeView: View {
     
     @Bindable var vm = HomeViewModel()
     @State var selectedDate : Date = Calendar.current.date(from: DateComponents(year: 2025, month: 1, day: 1))!
+    @State private var selectedLocation: String = "On-Site"
+    @State private var startTime: Date = Date() // Başlangıç saati
+    @State private var endTime: Date = Date()   // Bitiş saati
     
     var body: some View {
         List {
@@ -139,7 +164,10 @@ struct HomeView: View {
             livePollsSection
             createPollsSection
             addOptionsSection
+            locationPickerSection
+            timePickerSection
             calendarViewSection
+            
             
         }
         .scrollDismissesKeyboard(.interactively)
@@ -223,10 +251,10 @@ struct HomeView: View {
     
     var addOptionsSection: some View {
         Section("Seçenekler") {
-            TextField("Lokasyon girin", text: $vm.newOptionName)
+            TextField("Seçenek ekleyin", text: $vm.newOptionName)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
-            TextField("Etkinlik saati girin", text: $vm.newOptionName)
+            TextField("Seçenek ekleyin", text: $vm.newOptionName)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
             
@@ -242,6 +270,44 @@ struct HomeView: View {
         }
     }
     
+    var locationPickerSection: some View {
+            Section(header: Text("Lokasyon Seçimi")) {
+                Picker("Lokasyon", selection: $selectedLocation) {
+                    Text("On-Site").tag("On-Site")
+                    Text("Ofis").tag("Ofis")
+                }
+                .pickerStyle(SegmentedPickerStyle()) // Segment görünümü için
+            }
+        }
+    
+    var timePickerSection: some View {
+            Section(header: Text("Etkinlik Saatleri")) {
+                VStack(spacing: 10) {
+                    VStack {
+                        Text("Başlangıç Saati")
+                            .font(.headline)
+                        DatePicker("", selection: $startTime, displayedComponents: [.hourAndMinute])
+                            .datePickerStyle(.compact)
+                            .labelsHidden() // Etiketleri gizler
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(UIColor.systemGray6))
+                            .cornerRadius(10)
+                    }
+                    VStack {
+                        Text("Bitiş Saati")
+                            .font(.headline)
+                        DatePicker("", selection: $endTime, displayedComponents: [.hourAndMinute])
+                            .datePickerStyle(.compact)
+                            .labelsHidden() // Etiketleri gizler
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(UIColor.systemGray6))
+                            .cornerRadius(10)
+                    }
+                }
+            }
+        }
     var calendarViewSection : some View {
        
 
@@ -252,7 +318,7 @@ struct HomeView: View {
     }
 }
 
-extension String: Identifiable {
+extension String: @retroactive Identifiable {
     public var id: Self { self }
 }
 
